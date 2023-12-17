@@ -7,4 +7,4 @@ metadata:
 data:
   TIMEZONE: "America/Denver"
   METALLB_LB_RANGE: "10.0.1.100-10.0.1.250"
-  TRAEFIK_INGRESS_ADDR: "10.0.1.52"
+  TRAEFIK_INGRESS_ADDR: "10.0.1.150"
