@@ -89,8 +89,70 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 100Gi
+      storage: 10Gi
   selector:
     matchLabels:
       type: overseerr
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sabnzbd
+  labels:
+    type: sabnzbd
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  iscsi:
+     targetPortal: 10.0.0.11:3260
+     iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
+     lun: 5
+     fsType: 'ext4'
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sabnzbd
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  selector:
+    matchLabels:
+      type: sabnzbd
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: tautulli
+  labels:
+    type: tautulli
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  iscsi:
+     targetPortal: 10.0.0.11:3260
+     iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
+     lun: 6
+     fsType: 'ext4'
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tautulli
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  selector:
+    matchLabels:
+      type: tautulli
 ---
