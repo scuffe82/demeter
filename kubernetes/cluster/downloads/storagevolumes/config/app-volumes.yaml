@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: downloads-radarr
+  name: radarr
   labels:
-    type: downloads-radarr
+    type: radarr
 spec:
   capacity:
     storage: 10Gi
@@ -19,7 +19,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: downloads-radarr
+  name: radarr
 spec:
   accessModes:
     - ReadWriteMany
@@ -28,15 +28,15 @@ spec:
       storage: 10Gi
   selector:
     matchLabels:
-      type: downloads-radarr
+      type: radarr
 ---
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: downloads-sonarr
+  name: sonarr
   labels:
-    type: downloads-sonarr
+    type: sonarr
 spec:
   capacity:
     storage: 10Gi
@@ -51,7 +51,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: downloads-sonarr
+  name: sonarr
 spec:
   accessModes:
     - ReadWriteMany
@@ -60,15 +60,15 @@ spec:
       storage: 10Gi
   selector:
     matchLabels:
-      type: downloads-sonarr
+      type: sonarr
 ---
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: downloads-overseerr
+  name: overseerr
   labels:
-    type: downloads-overseerr
+    type: overseerr
 spec:
   capacity:
     storage: 10Gi
@@ -83,7 +83,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: downloads-overseerr
+  name: overseerr
 spec:
   accessModes:
     - ReadWriteMany
@@ -92,6 +92,5 @@ spec:
       storage: 100Gi
   selector:
     matchLabels:
-      type: downloads-overseerr
+      type: overseerr
 ---
-#changeme
