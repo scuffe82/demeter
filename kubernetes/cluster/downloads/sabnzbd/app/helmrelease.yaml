@@ -100,7 +100,7 @@ spec:
     persistence:
       config:
         enabled: true
-        existingClaim: sabnzbd
+        existingClaim: test
         mountPath: /config
       tmp:
         type: emptyDir
