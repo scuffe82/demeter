@@ -80,7 +80,7 @@ spec:
         enabled: true
         className: traefik
         annotations:
-          traefik.ingress.kubernetes.io/router.entrypoints: web
+          traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
         hosts:
           - host: &host "{{ .Release.Name }}.spenceops.com"
             paths:
@@ -88,6 +88,9 @@ spec:
                 service:
                   name: main
                   port: http
+        tls:
+          - hosts:
+              - *host
     persistence:
       config:
         enabled: true
