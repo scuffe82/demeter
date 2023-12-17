@@ -1,5 +1,6 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://kubernetes-schemas.devbu.io/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: sabnzbd
@@ -10,93 +11,108 @@ spec:
     spec:
       chart: app-template
       version: 2.4.0
-      interval: 30m
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  maxHistory: 2
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
-    controller:
-      annotations:
-        reloader.stakater.com/auto: "true"
-
-    image:
-      repository: ghcr.io/onedr0p/sabnzbd
-      tag: rolling
-    podSecurityContext:
-      runAsUser: 1027
-      runAsGroup: 1027
-      fsGroup: 1027
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 65536
-
-    env:
-      SABNZBD__PORT: &port 8080
-      SABNZBD__HOST_WHITELIST_ENTRIES: >-
-        sabnzbd,
-        sabnzbd.downloads,
-        sabnzbd.downloads.svc,
-        sabnzbd.downloads.svc.cluster,
-        sabnzbd.downloads.svc.cluster.local,
-        sabnzbd.spenceops.com
-
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/sabnzbd
+              tag: rolling
+            env:
+              TZ: America/Denver
+              SABNZBD__PORT: &port 8080
+              SABNZBD__HOST_WHITELIST_ENTRIES: >-
+                sabnzbd,
+                sabnzbd.downloads,
+                sabnzbd.downloads.svc,
+                sabnzbd.downloads.svc.cluster,
+                sabnzbd.downloads.svc.cluster.local,
+                sabnzbd.spenceops.com
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api?mode=version
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 200m
+                memory: 2Gi
+              limits:
+                cpu: 1000m
+                memory: 12Gi
+        pod:
+          securityContext:
+            runAsUser: 1027
+            runAsGroup: 1027
+            runAsNonRoot: true
+            fsGroup: 1027
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups: [65536]
     service:
       main:
         ports:
           http:
             port: *port
-
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: traefik
         annotations:
           traefik.ingress.kubernetes.io/router.entrypoints: web
         hosts:
-          - host: "sabnzbd.spenceops.com"
+          - host: &host "{{ .Release.Name }}.spenceops.com"
             paths:
               - path: /
-      external:
-        enabled: true
-        ingressClassName: "traefik"
-        annotations:
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          #traefik.ingress.kubernetes.io/router.middlewares: security-middleware-authentik@kubernetescrd
-        hosts:
-          - host: "sabnzbd.spenceops.com"
-            paths:
-              - path: /
-        tls:
-          - hosts:
-            - sabnzbd.spenceops.com
-        
+                service:
+                  name: main
+                  port: http
     persistence:
+      config:
+        enabled: true
+        existingClaim: sabnzbd
+        mountPath: /config
+      tmp:
+        type: emptyDir
       downloads:
         enabled: true
-        type: pvc
         mountPath: /downloads
         existingClaim: downloads-downloads
       postprocess:
         enabled: true
-        type: pvc
         mountPath: /postprocess
         existingClaim: downloads-postprocess
       plex-dev-temp:        
         enabled: true
-        type: pvc
         mountPath: /plex-dev-temp
         existingClaim: downloads-plex-dev
-      config:
-        enabled: true
-        type: pvc
-        mountPath: /config
-        existingClaim: sabnzbd
-
-    #resources:
-    #  requests:
-    #    cpu: 5m
-    #    memory: "2392M"
-    #  limits:
-    #    memory: "2392M"
