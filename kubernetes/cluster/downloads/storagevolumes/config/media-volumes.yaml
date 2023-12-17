@@ -28,6 +28,8 @@ spec:
   selector:
     matchLabels:
       type: downloads-postprocess
+  storageClassName: ""
+  volumeName: downloads-postprocess
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -58,6 +60,8 @@ spec:
   selector:
     matchLabels:
       type: downloads-plex-dev
+  storageClassName: ""
+  volumeName: downloads-plex-dev
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -88,6 +92,8 @@ spec:
   selector:
     matchLabels:
       type: downloads-downloads
+  storageClassName: ""
+  volumeName: downloads-downloads
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -118,6 +124,8 @@ spec:
   selector:
     matchLabels:
       type: downloads-tv
+  storageClassName: ""
+  volumeName: downloads-tv
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -148,4 +156,6 @@ spec:
   selector:
     matchLabels:
       type: downloads-movies
+  storageClassName: ""
+  volumeName: downloads-movies
 ---

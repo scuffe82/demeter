@@ -29,6 +29,8 @@ spec:
   selector:
     matchLabels:
       type: radarr
+  storageClassName: ""
+  volumeName: radarr
 ---
 ---
 apiVersion: v1
@@ -61,7 +63,8 @@ spec:
   selector:
     matchLabels:
       type: sonarr
----
+  storageClassName: ""
+  volumeName: sonarr
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -93,6 +96,8 @@ spec:
   selector:
     matchLabels:
       type: overseerr
+  storageClassName: ""
+  volumeName: overseerr
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -124,6 +129,8 @@ spec:
   selector:
     matchLabels:
       type: sabnzbd
+  storageClassName: ""
+  volumeName: sabnzbd
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -155,4 +162,6 @@ spec:
   selector:
     matchLabels:
       type: tautulli
+  storageClassName: ""
+  volumeName: tautulli
 ---
