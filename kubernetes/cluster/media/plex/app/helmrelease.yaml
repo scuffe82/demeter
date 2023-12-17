@@ -1,0 +1,79 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: plex
+  namespace: media
+spec:
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+  interval: 30m
+  values:
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+    image:
+      repository: ghcr.io/onedr0p/plex
+      tag: 1.32.6.7557-1cf77d501@sha256:6f87b0811df009af1defc9afad6afa383b9d821a7fcaddc968df41ba445d321e
+    service:
+      main:
+        type: LoadBalancer
+        externalTrafficPolicy: Cluster
+        loadBalancerIP: 10.0.1.200
+        ports:
+          http:
+            port: 32400
+
+    env:
+      PLEX_CLAIM: claim-f6uFeemA-bECyEtqLDyX
+      CHANGE_CONFIG_DIR_OWNERSHIP: 'false'
+      #PLEX_UID: '1027'
+      #PLEX_GID: '65536'
+      TZ: 'America/Denver'
+      ADVERTISE_IP: 'http://10.0.1.200:32400'
+
+    persistence:
+      tv:
+        enabled: true
+        mountPath: /tv
+        type: pvc
+        existingClaim: media-tv
+      movies:
+        enabled: true
+        mountPath: /movies
+        type: pvc
+        existingClaim: media-movies
+      config:
+        enabled: true
+        mountPath: /config
+        type: pvc
+        existingClaim: media-plex
+      transcode:
+        enabled: true
+        type: emptyDir
+
+    podSecurityContext:
+      runAsUser: 1027
+      runAsGroup: 65536
+      fsGroup: 1027
+      fsGroupChangePolicy: "OnRootMismatch"
+      supplementalGroups:
+        - 44
+        - 109
+
+    nodeSelector:
+      plex: "true"
+
+    resources:
+      requests:
+        gpu.intel.com/i915: 1
+      limits:
+        gpu.intel.com/i915: 1

@@ -1,0 +1,67 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: authentik
+  namespace: security
+spec:
+  interval: 5m
+  chart:
+    spec:
+      chart: authentik
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+        namespace: flux-system
+      interval: 5m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  values:
+    image:
+      repository: ghcr.io/goauthentik/server
+      pullPolicy: IfNotPresent
+    deployment:
+      kind: Deployment
+      replicas: 1
+    service:
+      enabled: true
+      type: LoadBalancer
+      spec:
+        loadBalancerIP: 10.0.1.101
+        externalTrafficPolicy: Local
+    authentik:
+      secret_key: "${SECRET_AUTHENTIK_KEY}"
+      error_reporting:
+          enabled: true
+      postgresql:
+        password: ${SECRET_AUTHENTIK_POSTGRES_PASS}
+
+    postgresql:
+      enabled: true
+      postgresqlPassword: ${SECRET_AUTHENTIK_POSTGRES_PASS}
+
+    redis:
+      enabled: true
+
+    ingress:
+      enabled: true
+      ingressClassName: "traefik"
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      hosts:
+        - host: auth.spenceops.com
+          paths:
+            - path: "/"
+              pathType: Prefix
+        - host: "*.spenceops.com"
+          paths:
+            - path: /outpost.goauthentik.io/
+              pathType: Prefix
+      tls:
+          - hosts:
+            - auth.spenceops.com
+            secretName: spenceops-com-tls

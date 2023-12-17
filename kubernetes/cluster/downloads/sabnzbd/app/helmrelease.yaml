@@ -1,0 +1,106 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: sabnzbd
+  namespace: downloads
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 1.5.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
+    image:
+      repository: ghcr.io/onedr0p/sabnzbd
+      tag: 4.1.0@sha256:91f3cd6b9f1c9988af5447f464b299630706eb7f691dee857eab1487d4bb626e
+
+    podSecurityContext:
+      runAsUser: 1027
+      runAsGroup: 1027
+      fsGroup: 1027
+      fsGroupChangePolicy: "OnRootMismatch"
+      supplementalGroups:
+        - 65536
+
+    env:
+      SABNZBD__PORT: &port 8080
+      SABNZBD__HOST_WHITELIST_ENTRIES: >-
+        sabnzbd,
+        sabnzbd.downloads,
+        sabnzbd.downloads.svc,
+        sabnzbd.downloads.svc.cluster,
+        sabnzbd.downloads.svc.cluster.local,
+        sabnzbd.spenceops.com
+
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+
+    ingress:
+      main:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: web
+        hosts:
+          - host: "sabnzbd.spenceops.com"
+            paths:
+              - path: /
+      external:
+        enabled: true
+        ingressClassName: "traefik"
+        annotations:
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.middlewares: security-middleware-authentik@kubernetescrd
+        hosts:
+          - host: "sabnzbd.spenceops.com"
+            paths:
+              - path: /
+        tls:
+          - hosts:
+            - sabnzbd.spenceops.com
+        
+    persistence:
+      downloads:
+        enabled: true
+        type: pvc
+        mountPath: /downloads
+        existingClaim: downloads-downloads
+      postprocess:
+        enabled: true
+        type: pvc
+        mountPath: /postprocess
+        existingClaim: downloads-postprocess
+      plex-dev-temp:        
+        enabled: true
+        type: pvc
+        mountPath: /plex-dev-temp
+        existingClaim: downloads-plex-dev
+      config:
+        enabled: true
+        type: pvc
+        mountPath: /config
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        storageClass: synology-csi-retain
+        retain: true
+
+    #resources:
+    #  requests:
+    #    cpu: 5m
+    #    memory: "2392M"
+    #  limits:
+    #    memory: "2392M"
