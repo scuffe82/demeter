@@ -13,7 +13,7 @@ spec:
   iscsi:
      targetPortal: 10.0.0.11:3260
      iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
-     lun: 3
+     lun: 4
      fsType: 'ext4'
 ---
 apiVersion: v1
@@ -47,7 +47,7 @@ spec:
   iscsi:
      targetPortal: 10.0.0.11:3260
      iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
-     lun: 4
+     lun: 3
      fsType: 'ext4'
 ---
 apiVersion: v1
@@ -80,7 +80,7 @@ spec:
   iscsi:
      targetPortal: 10.0.0.11:3260
      iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
-     lun: 7
+     lun: 5
      fsType: 'ext4'
 ---
 apiVersion: v1
@@ -113,7 +113,7 @@ spec:
   iscsi:
      targetPortal: 10.0.0.11:3260
      iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
-     lun: 5
+     lun: 6
      fsType: 'ext4'
 ---
 apiVersion: v1
@@ -146,7 +146,7 @@ spec:
   iscsi:
      targetPortal: 10.0.0.11:3260
      iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
-     lun: 6
+     lun: 7
      fsType: 'ext4'
 ---
 apiVersion: v1
