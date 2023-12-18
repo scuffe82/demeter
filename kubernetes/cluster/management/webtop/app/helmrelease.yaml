@@ -45,10 +45,10 @@ spec:
               TZ: America/Denver
               TITLE: Desktop
               WEBTOP_PORT: &port 3000
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: false
-              capabilities: { drop: ["ALL"] }
+            # securityContext:
+            #   allowPrivilegeEscalation: false
+            #   readOnlyRootFilesystem: false
+            #   capabilities: { drop: ["ALL"] }
             resources:
               requests:
                 cpu: 200m
