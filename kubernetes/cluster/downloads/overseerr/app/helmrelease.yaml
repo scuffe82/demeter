@@ -36,39 +36,39 @@ spec:
             env:
               TZ: America/Denver
               PORT: &port 5055
-            # probes:
-            #   liveness: &probes
-            #     enabled: true
-            #     custom: true
-            #     spec:
-            #       httpGet:
-            #         path: /api/v1/status
-            #         port: *port
-            #       initialDelaySeconds: 0
-            #       periodSeconds: 10
-            #       timeoutSeconds: 1
-            #       failureThreshold: 3
-            #   readiness: *probes
-            #   startup:
-            #     enabled: false
-            # securityContext:
-            #   allowPrivilegeEscalation: false
-            #   readOnlyRootFilesystem: true
-            #   capabilities: { drop: ["ALL"] }
-            # resources:
-            #   requests:
-            #     cpu: 100m
-            #     memory: 256Mi
-            #   limits:
-            #     memory: 2Gi
-        # pod:
-        #   securityContext:
-        #     runAsUser: 1027
-        #     runAsGroup: 1027
-        #     runAsNonRoot: true
-        #     fsGroup: 1027
-        #     fsGroupChangePolicy: OnRootMismatch
-        #     supplementalGroups: [65536]
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v1/status
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+        pod:
+          securityContext:
+            runAsUser: 1027
+            runAsGroup: 1027
+            runAsNonRoot: true
+            fsGroup: 1027
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups: [65536]
     service:
       main:
         ports:
@@ -91,5 +91,6 @@ spec:
       config:
         enabled: true
         existingClaim: overseerr
+        mountPath: /app/config
       tmp:
         type: emptyDir
