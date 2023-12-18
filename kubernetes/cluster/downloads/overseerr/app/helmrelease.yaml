@@ -89,7 +89,7 @@ spec:
                   port: http
     persistence:
       config:
-        enabled: true
+        enabled: false
         existingClaim: overseerr
       tmp:
         type: emptyDir
