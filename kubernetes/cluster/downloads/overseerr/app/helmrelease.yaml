@@ -63,11 +63,12 @@ spec:
                 memory: 2Gi
         pod:
           securityContext:
-            runAsUser: 568
-            runAsGroup: 568
+            runAsUser: 1027
+            runAsGroup: 1027
             runAsNonRoot: true
-            fsGroup: 568
+            fsGroup: 1027
             fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups: [65536]
     service:
       main:
         ports:
