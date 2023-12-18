@@ -27,4 +27,4 @@ spec:
     keepHistory: false
   values:
     prometheus:
-      enable: true
+      enable: false
