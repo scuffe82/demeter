@@ -16,6 +16,7 @@ resources:
   - ./metallb.yaml
   - ./metrics-server.yaml
   - ./nfs-subdir.yaml
+  - ./node-feature-discovery.yaml
   - ./stakater.yaml
   - ./synology-csi.yaml
   - ./traefik.yaml
