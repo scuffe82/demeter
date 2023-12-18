@@ -1,94 +1,105 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: radarr
-  namespace: downloads
 spec:
   interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
-      interval: 30m
+      version: 2.4.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
-    controller:
-      annotations:
-        reloader.stakater.com/auto: "true"
-
-    image:
-      repository: ghcr.io/onedr0p/radarr-develop
-      tag: 5.1.1.8195@sha256:9579f7c96c5db2f1f98219e83a296b27c696d1f7e18ab4cf2deb90e9e9b3ef37
-
-    podSecurityContext:
-      runAsUser: 1027
-      runAsGroup: 1027
-      fsGroup: 1027
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 65536
-
-    env:
-      RADARR__INSTANCE_NAME: Radarr
-      RADARR__PORT: &port 7878
-      
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/radarr-develop
+              tag: rolling
+            env:
+              COMPlus_EnableDiagnostics: "0"
+              RADARR__PORT: &port 7878
+              TZ: America/Denver
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256M
+              limits:
+                memory: 1Gi
+        pod:
+          securityContext:
+            runAsUser: 1027
+            runAsGroup: 1027
+            runAsNonRoot: true
+            fsGroup: 1027
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups: [65536]
     service:
       main:
         ports:
           http:
             port: *port
-
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: traefik
         annotations:
           traefik.ingress.kubernetes.io/router.entrypoints: web
         hosts:
-          - host: "radarr.spenceops.com"
+          - host: &host "{{ .Release.Name }}.spenceops.com"
             paths:
               - path: /
-      external:
-        enabled: true
-        ingressClassName: "traefik"
-        annotations:
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: security-middleware-authentik@kubernetescrd
-        hosts:
-          - host: "radarr.spenceops.com"
-            paths:
-              - path: /
-        tls:
-          - hosts:
-            - radarr.spenceops.com
-        
+                service:
+                  name: main
+                  port: http
     persistence:
+      config:
+        enabled: true
+        existingClaim: radarr
+        mountPath: /config
       postprocess:
         enabled: true
-        type: pvc
         mountPath: /postprocess
         existingClaim: downloads-postprocess
       movies:
         enabled: true
-        type: pvc
         mountPath: /movies
         existingClaim: downloads-movies
-      config:
-        enabled: true
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 10Gi
-        storageClass: synology-csi-retain
-        retain: true   
-
-    #resources:
-    #  requests:
-    #    cpu: 14m
-    #    memory: 431M
-    #  limits:
-    #    memory: 431M
+      tmp:
+        type: emptyDir

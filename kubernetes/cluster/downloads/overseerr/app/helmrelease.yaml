@@ -1,82 +1,95 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: overseerr
-  namespace: downloads
 spec:
   interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
-      interval: 30m
+      version: 2.4.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
-    controller:
-      annotations:
-        reloader.stakater.com/auto: "true"
-
-    image:
-      repository: ghcr.io/sct/overseerr
-      tag: 1.33.2
-
-    podSecurityContext:
-      runAsUser: 1027
-      runAsGroup: 1027
-      fsGroup: 1027
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 65536
-
-    env:
-      TZ: America/Denver
-      OVERSEERR__PORT: &port 5055
-
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/sct/overseerr
+              tag: develop
+            env:
+              TZ: America/Denver
+              PORT: &port 5055
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v1/status
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+        pod:
+          securityContext:
+            runAsUser: 568
+            runAsGroup: 568
+            runAsNonRoot: true
+            fsGroup: 568
+            fsGroupChangePolicy: OnRootMismatch
     service:
       main:
         ports:
           http:
             port: *port
-
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: traefik
         annotations:
           traefik.ingress.kubernetes.io/router.entrypoints: web
         hosts:
-          - host: "overseerr.spenceops.com"
+          - host: &host "{{ .Release.Name }}.spenceops.com"
             paths:
               - path: /
-      external:
-        enabled: true
-        ingressClassName: "traefik"
-        annotations:
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: security-middleware-authentik@kubernetescrd
-        hosts:
-          - host: "overseerr.spenceops.com"
-            paths:
-              - path: /
-        tls:
-          - hosts:
-            - overseerr.spenceops.com
-
+                service:
+                  name: main
+                  port: http
     persistence:
       config:
         enabled: true
-        mountPath: /app/config
-        existingClaim: downloads-overseerr
-        type: pvc
-        
-#    resources:
-#      requests:
-#        cpu: 20m
-#        memory: 323M
-#      limits:
-#        memory: 323M
+        existingClaim: overseerr
+        mountPath: /config
+      tmp:
+        type: emptyDir

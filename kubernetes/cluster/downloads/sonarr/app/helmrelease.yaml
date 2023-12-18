@@ -1,94 +1,105 @@
 ---
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
 kind: HelmRelease
 metadata:
   name: sonarr
-  namespace: downloads
 spec:
   interval: 30m
   chart:
     spec:
       chart: app-template
-      version: 1.5.1
-      interval: 30m
+      version: 2.4.0
       sourceRef:
         kind: HelmRepository
         name: bjw-s
         namespace: flux-system
-
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  uninstall:
+    keepHistory: false
   values:
-    controller:
-      annotations:
-        reloader.stakater.com/auto: "true"
-
-    image:
-      repository: ghcr.io/onedr0p/sonarr-develop
-      tag: 4.0.0.700@sha256:9ae40655d519479d4d70a8d67f929142a0fc2d10df0b75a0947ee3a6c8da7f53
-
-    podSecurityContext:
-      runAsUser: 1027
-      runAsGroup: 1027
-      fsGroup: 1027
-      fsGroupChangePolicy: "OnRootMismatch"
-      supplementalGroups:
-        - 65536
-
-    env:
-      SONARR__INSTANCE_NAME: Sonarr
-      SONARR__PORT: &port 8989
-
+    controllers:
+      main:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          main:
+            image:
+              repository: ghcr.io/onedr0p/sonarr-develop
+              tag: rolling
+            env:
+              COMPlus_EnableDiagnostics: "0"
+              SONARR__PORT: &port 8989
+              TZ: America/Denver
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /ping
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+              startup:
+                enabled: false
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities: { drop: ["ALL"] }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 256M
+              limits:
+                memory: 1Gi
+        pod:
+          securityContext:
+            runAsUser: 1027
+            runAsGroup: 1027
+            runAsNonRoot: true
+            fsGroup: 1027
+            fsGroupChangePolicy: OnRootMismatch
+            supplementalGroups: [65536]
     service:
       main:
         ports:
           http:
             port: *port
-
     ingress:
       main:
         enabled: true
-        ingressClassName: "traefik"
+        className: traefik
         annotations:
           traefik.ingress.kubernetes.io/router.entrypoints: web
         hosts:
-          - host: "sonarr.spenceops.com"
+          - host: &host "{{ .Release.Name }}.spenceops.com"
             paths:
               - path: /
-      external:
-        enabled: true
-        ingressClassName: "traefik"
-        annotations:
-          traefik.ingress.kubernetes.io/router.entrypoints: websecure
-          traefik.ingress.kubernetes.io/router.middlewares: security-middleware-authentik@kubernetescrd
-        hosts:
-          - host: "sonarr.spenceops.com"
-            paths:
-              - path: /
-        tls:
-          - hosts:
-            - sonarr.spenceops.com
-
+                service:
+                  name: main
+                  port: http
     persistence:
+      config:
+        enabled: true
+        existingClaim: sonarr
+        mountPath: /config
       postprocess:
         enabled: true
-        type: pvc
         mountPath: /postprocess
         existingClaim: downloads-postprocess
       movies:
         enabled: true
-        type: pvc
         mountPath: /tv
         existingClaim: downloads-tv
-      config:
-        enabled: true
-        mountPath: /config
-        accessMode: ReadWriteOnce
-        size: 10Gi
-        storageClass: synology-csi-retain
-        retain: true   
-
-#    resources:
-#      requests:
-#        cpu: 20m
-#        memory: 323M
-#      limits:
-#        memory: 323M
+      tmp:
+        type: emptyDir
