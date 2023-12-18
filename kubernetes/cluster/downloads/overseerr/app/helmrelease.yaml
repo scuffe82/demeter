@@ -91,6 +91,5 @@ spec:
       config:
         enabled: true
         existingClaim: overseerr
-        mountPath: /config
       tmp:
         type: emptyDir

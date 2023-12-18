@@ -28,6 +28,8 @@ spec:
   selector:
     matchLabels:
       type: media-plex-dev
+  storageClassName: ""
+  volumeName: media-plex-dev
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -58,6 +60,8 @@ spec:
   selector:
     matchLabels:
       type: media-tv
+  storageClassName: ""
+  volumeName: media-tv
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -88,4 +92,6 @@ spec:
   selector:
     matchLabels:
       type: media-movies
+  storageClassName: ""
+  volumeName: media-movies
 ---
