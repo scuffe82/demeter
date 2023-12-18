@@ -87,9 +87,9 @@ spec:
                 service:
                   name: main
                   port: http
-    # persistence:
-    #   config:
-    #     enabled: true
-    #     existingClaim: overseerr
-    #   tmp:
-    #     type: emptyDir
+    persistence:
+      config:
+        enabled: true
+        existingClaim: overseerr
+      tmp:
+        type: emptyDir
