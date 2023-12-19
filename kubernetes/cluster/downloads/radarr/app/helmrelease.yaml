@@ -92,17 +92,10 @@ spec:
           - hosts:
               - *host
     persistence:
-      # config:
-      #   enabled: true
-      #   existingClaim: radarr
-      #   mountPath: /config
       config:
         enabled: true
+        existingClaim: radarr
         mountPath: /config
-        accessModes: ReadWriteOnce
-        size: 10Gi
-        storageClassName: ""
-        volumeName: radarr
       postprocess:
         enabled: true
         mountPath: /postprocess

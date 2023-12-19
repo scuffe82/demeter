@@ -16,22 +16,21 @@ spec:
      lun: 4
      fsType: 'ext4'
 ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: radarr
-# spec:
-#   accessModes:
-#     - ReadWriteMany
-#   resources:
-#     requests:
-#       storage: 10Gi
-#   selector:
-#     matchLabels:
-#       type: radarr
-#   storageClassName: ""
-#   volumeName: radarr
----
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: radarr
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+  selector:
+    matchLabels:
+      type: radarr
+  storageClassName: ""
+  volumeName: radarr
 ---
 apiVersion: v1
 kind: PersistentVolume
