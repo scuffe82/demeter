@@ -93,9 +93,8 @@ spec:
           - hosts:
               - *host
     persistence:
-      configz:
+      app/config:
         enabled: true
         existingClaim: overseerr
-        mountPath: /app/config-abc
       tmp:
         type: emptyDir
