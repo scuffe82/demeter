@@ -7,3 +7,4 @@ resources:
   - radarr/deployment.yaml
   - sonarr/deployment.yaml
   - overseerr/deployment.yaml
+  - prowlarr/deployment.yaml

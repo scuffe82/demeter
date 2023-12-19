@@ -103,18 +103,22 @@ spec:
       config:
         enabled: true
         existingClaim: sabnzbd
-        mountPath: /config
+        globalMounts:
+          - path: /config
       tmp:
         type: emptyDir
       downloads:
         enabled: true
-        mountPath: /downloads
         existingClaim: downloads-downloads
+        globalMounts:
+          - path: /downloads
       postprocess:
         enabled: true
-        mountPath: /postprocess
         existingClaim: downloads-postprocess
+        globalMounts:
+          - path: /postprocess
       plex-dev-temp:        
         enabled: true
-        mountPath: /plex-dev-temp
         existingClaim: downloads-plex-dev
+        globalMounts:
+          - path: /plex-dev-temp

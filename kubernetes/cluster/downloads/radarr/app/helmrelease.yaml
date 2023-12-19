@@ -95,14 +95,17 @@ spec:
       config:
         enabled: true
         existingClaim: radarr
-        mountPath: /config
+        globalMounts:
+          - path: /config
       postprocess:
         enabled: true
-        mountPath: /postprocess
         existingClaim: downloads-postprocess
+        globalMounts:
+          - path: /postprocess
       movies:
         enabled: true
-        mountPath: /movies
         existingClaim: downloads-movies
+        globalMounts:
+          - path: /movies
       tmp:
         type: emptyDir

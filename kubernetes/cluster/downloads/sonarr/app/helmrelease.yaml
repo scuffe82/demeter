@@ -95,14 +95,17 @@ spec:
       config:
         enabled: true
         existingClaim: sonarr
-        mountPath: /config
+        globalMounts:
+          - path: /config
       postprocess:
         enabled: true
-        mountPath: /postprocess
         existingClaim: downloads-postprocess
-      movies:
+        globalMounts:
+          - path: /postprocess
+      tv:
         enabled: true
-        mountPath: /tv
         existingClaim: downloads-tv
+        globalMounts:
+          - path: /tv
       tmp:
         type: emptyDir

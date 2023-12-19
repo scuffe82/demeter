@@ -85,6 +85,8 @@ spec:
     persistence:
       config:
         enabled: false
-        #existingClaim: sabnzbd
+        #existingClaim: webtop
+        #globalMounts:
+        #  - path: /config
       tmp:
         type: emptyDir
