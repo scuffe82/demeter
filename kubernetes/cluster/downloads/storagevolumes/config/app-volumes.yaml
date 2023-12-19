@@ -12,8 +12,8 @@ spec:
     - ReadWriteMany
   iscsi:
      targetPortal: 10.0.0.11:3260
-     iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
-     lun: 4
+     iqn: iqn.2000-01.com.synology:crypteia.radarr
+     lun: 1
      fsType: 'ext4'
 ---
 apiVersion: v1
@@ -45,8 +45,8 @@ spec:
     - ReadWriteMany
   iscsi:
      targetPortal: 10.0.0.11:3260
-     iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
-     lun: 8
+     iqn: iqn.2000-01.com.synology:crypteia.sonarr
+     lun: 1
      fsType: 'ext4'
 ---
 apiVersion: v1
@@ -78,8 +78,8 @@ spec:
     - ReadWriteMany
   iscsi:
      targetPortal: 10.0.0.11:3260
-     iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
-     lun: 5
+     iqn: iqn.2000-01.com.synology:crypteia.overseerr
+     lun: 1
      fsType: 'ext4'
 ---
 apiVersion: v1
@@ -111,8 +111,8 @@ spec:
     - ReadWriteMany
   iscsi:
      targetPortal: 10.0.0.11:3260
-     iqn: iqn.2000-01.com.synology:crypteia.default-target.9ae28f60be2
-     lun: 6
+     iqn: iqn.2000-01.com.synology:crypteia.sabnzbd
+     lun: 1
      fsType: 'ext4'
 ---
 apiVersion: v1
