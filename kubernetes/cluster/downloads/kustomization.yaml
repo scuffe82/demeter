@@ -6,4 +6,4 @@ resources:
   - sabnzbd/deployment.yaml
   - radarr/deployment.yaml
   - sonarr/deployment.yaml
-  #- overseerr/deployment.yaml
+  - overseerr/deployment.yaml
