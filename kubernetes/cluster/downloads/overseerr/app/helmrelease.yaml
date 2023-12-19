@@ -1,8 +1,3 @@
-#  dependsOn:
-#    - name: demeter-cluster
-#    - name: downloads-storagevolumes
-#
-#
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
 apiVersion: helm.toolkit.fluxcd.io/v2beta2
