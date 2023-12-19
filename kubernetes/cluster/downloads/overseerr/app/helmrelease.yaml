@@ -93,8 +93,10 @@ spec:
           - hosts:
               - *host
     persistence:
-      app/config:
+      config:
         enabled: true
         existingClaim: overseerr
+        globalMounts:
+          - path: /app/config
       tmp:
         type: emptyDir
