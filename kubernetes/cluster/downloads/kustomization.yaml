@@ -8,3 +8,4 @@ resources:
   - sonarr/deployment.yaml
   - overseerr/deployment.yaml
   - prowlarr/deployment.yaml
+  - nzbget/deployment.yaml
