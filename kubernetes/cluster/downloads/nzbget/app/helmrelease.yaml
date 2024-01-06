@@ -66,8 +66,6 @@ spec:
         existingClaim: nzbget
         globalMounts:
           - path: /config
-      tmp:
-        type: emptyDir
       downloads:
         enabled: true
         existingClaim: downloads-downloads
