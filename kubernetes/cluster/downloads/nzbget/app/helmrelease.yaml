@@ -39,16 +39,6 @@ spec:
               TZ: America/Denver
               PUID: 1027
               PGID: 65536
-            securityContext:
-              allowPrivilegeEscalation: false
-              readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
-            resources:
-              requests:
-                cpu: 200m
-                memory: 2Gi
-              limits:
-                memory: 12Gi
     service:
       main:
         ports:
